@@ -47,6 +47,7 @@ RUN \
         && rm -rf /var/cache/apt/* \
         && rm -rf  /tmp/*
 
+COPY mosquitto.conf /etc/mosquitto/mosquitto.conf
 VOLUME ["/var/lib/mosquitto"]
 
 EXPOSE 1883 8883
