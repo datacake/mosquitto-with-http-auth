@@ -3,6 +3,9 @@ FROM debian:jessie
 ENV MOSQUITTO_VERSION=1.5.5 \
     GPG_KEYS=A0D6EEA1DCAE49A635A3B2F0779B22DFB3E717B7
 
+COPY be-http.patch /tmp/be-http.patch
+RUN sed -i '/jessie-updates/d' /etc/apt/sources.list
+RUN apt-get -o Acquire::Check-Valid-Until=false update
 RUN \
         set -x; \
         apt-get update && apt-get install -y --no-install-recommends \
@@ -30,6 +33,7 @@ RUN \
         && git clone https://github.com/jpmens/mosquitto-auth-plug.git \
         && cd mosquitto-auth-plug \
         && git checkout tags/0.1.3 -b latest \
+        && patch be-http.c < /tmp/be-http.patch \
         && cp config.mk.in config.mk \
         && sed -i "s/BACKEND_HTTP ?= no/BACKEND_HTTP ?= yes/" config.mk \
         && sed -i "s/BACKEND_MYSQL ?= yes/BACKEND_MYSQL ?= no/" config.mk \

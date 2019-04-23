@@ -1,0 +1,10 @@
+--- be-http.c	2019-04-24 00:11:14.000000000 +0200
++++ be-http.1.c	2019-04-24 00:11:43.000000000 +0200
+@@ -195,6 +195,7 @@
+ 	curl_easy_setopt(curl, CURLOPT_USERNAME, username);
+ 	curl_easy_setopt(curl, CURLOPT_PASSWORD, password);
+ 	curl_easy_setopt(curl, CURLOPT_TIMEOUT, 10);
++    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
+ 
+ 	re = curl_easy_perform(curl);
+ 	if (re == CURLE_OK) {
