@@ -1,35 +1,26 @@
 FROM debian:jessie
 
-ENV MOSQUITTO_VERSION=1.5.8 \
-    GPG_KEYS=A0D6EEA1DCAE49A635A3B2F0779B22DFB3E717B7
-
 COPY be-http.patch /tmp/be-http.patch
 RUN sed -i '/jessie-updates/d' /etc/apt/sources.list
 RUN apt-get -o Acquire::Check-Valid-Until=false update
 RUN \
-    set -x; \
-    apt-get update && apt-get install -y --no-install-recommends \
-    libc-ares-dev git libmysqlclient-dev libssl-dev   uuid-dev build-essential wget  ca-certificates \
-    curl libcurl4-openssl-dev  libc-ares2 libcurl3 libwebsockets-dev daemon quilt \
-    && cd /tmp \
-    && wget http://mosquitto.org/files/source/mosquitto-$MOSQUITTO_VERSION.tar.gz -O mosquitto.tar.gz \
-    && wget http://mosquitto.org/files/source/mosquitto-$MOSQUITTO_VERSION.tar.gz.asc -O mosquitto.tar.gz.asc \
-    export GNUPGHOME="$(mktemp -d)" && \
-    found=''; \
-    for server in \
-    ha.pool.sks-keyservers.net \
-    hkp://keyserver.ubuntu.com:80 \
-    hkp://p80.pool.sks-keyservers.net:80 \
-    pgp.mit.edu \
-    ; do \
-    echo "Fetching GPG key $GPG_KEYS from $server"; \
-    gpg --keyserver "$server" --keyserver-options timeout=10 --recv-keys "$GPG_KEYS" && found=yes && break; \
-    done; \
-    gpg --verify mosquitto.tar.gz.asc \
-    && mkdir mosquitto-src && tar xfz mosquitto.tar.gz --strip-components=1 -C mosquitto-src \
-    && cd mosquitto-src \
-    && make WITH_SRV=yes WITH_MEMORY_TRACKING=no \
-    && make install && ldconfig \
+    apt-get update && apt-get install -y git cmake libc-ares-dev uuid-dev libssl-dev zlib1g-dev wget build-essential libcurl4-openssl-dev \
+    && wget https://github.com/warmcat/libwebsockets/archive/v1.6.2.tar.gz \
+    && tar xzvf v1.6.2.tar.gz \
+    && cd libwebsockets-1.6.2 \
+    && mkdir build \
+    && cd build \
+    && cmake .. -DLIB_SUFFIX=64 \
+    && make install \
+    && ln -s /usr/local/lib64/libwebsockets.so.6 /lib/libwebsockets.so.6 \
+    && cd ../.. \
+    && wget http://mosquitto.org/files/source/mosquitto-1.5.8.tar.gz \
+    && tar xzvf mosquitto-1.5.8.tar.gz \
+    && cd mosquitto-1.5.8 \
+    && make WITH_WEBSOCKETS=yes \
+    && make install \
+    && groupadd mosquitto \
+    && useradd -s /sbin/nologin mosquitto -g mosquitto -d /var/lib/mosquitto \
     && git clone https://github.com/datacake/mosquitto-auth-plug.git \
     && cd mosquitto-auth-plug \
     && git checkout tags/0.1.3 -b latest \
@@ -45,7 +36,7 @@ RUN \
     && cp np /usr/bin/np \
     && mkdir /mqtt && cp auth-plug.so /mqtt/ \
     && cp auth-plug.so /usr/local/lib/ \
-    && useradd -r mosquitto \
+    # && useradd -r mosquitto \
     && apt-get purge -y build-essential git wget ca-certificates \
     && apt-get autoremove -y \
     && apt-get -y autoclean \
