@@ -10,7 +10,7 @@ RUN \
     set -x; \
     apt-get update && apt-get install -y --no-install-recommends \
     libc-ares-dev git libmysqlclient-dev libssl-dev   uuid-dev build-essential wget  ca-certificates \
-    curl libcurl4-openssl-dev  libc-ares2 libcurl3 libwebsockets-dev daemon quilt \
+    curl libcurl4-openssl-dev  libc-ares2 libcurl3 libwebsockets-dev daemon quilt libwebsockets \
     && cd /tmp \
     && wget http://mosquitto.org/files/source/mosquitto-$MOSQUITTO_VERSION.tar.gz -O mosquitto.tar.gz \
     && wget http://mosquitto.org/files/source/mosquitto-$MOSQUITTO_VERSION.tar.gz.asc -O mosquitto.tar.gz.asc \
@@ -40,7 +40,7 @@ RUN \
     && sed -i "s/CFG_LDFLAGS =/CFG_LDFLAGS = -lcares/" config.mk \
     && sed -i "s/MOSQUITTO_SRC =/MOSQUITTO_SRC = \/tmp\/mosquitto-src\//" config.mk \
     && sed -i "s/SUPPORT_DJANGO_HASHERS ?= no/SUPPORT_DJANGO_HASHERS ?= yes/" config.mk \
-    && echo "WITH_WEBSOCKETS ?= yes" >> config.mk \
+    && echo "WITH_WEBSOCKETS:=yes" >> config.mk \
     && make \
     && cp np /usr/bin/np \
     && mkdir /mqtt && cp auth-plug.so /mqtt/ \
