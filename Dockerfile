@@ -10,7 +10,7 @@ RUN \
     set -x; \
     apt-get update && apt-get install -y --no-install-recommends \
     libc-ares-dev git libmysqlclient-dev libssl-dev   uuid-dev build-essential wget  ca-certificates \
-    curl libcurl4-openssl-dev  libc-ares2 libcurl3 libwebsockets-dev daemon quilt libwebsockets \
+    curl libcurl4-openssl-dev  libc-ares2 libcurl3 libwebsockets-dev daemon quilt \
     && cd /tmp \
     && wget http://mosquitto.org/files/source/mosquitto-$MOSQUITTO_VERSION.tar.gz -O mosquitto.tar.gz \
     && wget http://mosquitto.org/files/source/mosquitto-$MOSQUITTO_VERSION.tar.gz.asc -O mosquitto.tar.gz.asc \
