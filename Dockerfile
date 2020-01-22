@@ -30,7 +30,7 @@ RUN \
     && cd mosquitto-src \
     && make WITH_SRV=yes WITH_MEMORY_TRACKING=no \
     && make install && ldconfig \
-    && git clone https://github.com/jpmens/mosquitto-auth-plug.git \
+    && git clone https://github.com/datacake/mosquitto-auth-plug.git \
     && cd mosquitto-auth-plug \
     && git checkout tags/0.1.3 -b latest \
     && patch be-http.c < /tmp/be-http.patch \
@@ -40,7 +40,7 @@ RUN \
     && sed -i "s/CFG_LDFLAGS =/CFG_LDFLAGS = -lcares/" config.mk \
     && sed -i "s/MOSQUITTO_SRC =/MOSQUITTO_SRC = \/tmp\/mosquitto-src\//" config.mk \
     && sed -i "s/SUPPORT_DJANGO_HASHERS ?= no/SUPPORT_DJANGO_HASHERS ?= yes/" config.mk \
-    && sed -i "s/WITH_WEBSOCKETS ?= no/WITH_WEBSOCKETS ?= yes/" config.mk \
+    && echo "WITH_WEBSOCKETS ?= yes" >> config.mk \
     && make \
     && cp np /usr/bin/np \
     && mkdir /mqtt && cp auth-plug.so /mqtt/ \
